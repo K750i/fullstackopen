@@ -40,13 +40,21 @@ function App() {
     e.preventDefault()
     const personExist = persons.find(person => person.name === newName)
 
-    if (personExist) {
-      alert(`${newName} was already added to the phonebook`)
+    if (newName.trim() === '') {
+      alert('Name cannot be empty.')
       return
     }
 
-    if (newName.trim() === '') {
-      alert('Name cannot be empty.')
+    if (personExist) {
+      if (confirm(`${personExist.name} is already added to phonebook, replace the old number with the new one?`)) {
+        phoneService
+          .updatePhone(personExist.id, { ...personExist, number: newNumber })
+          .then(updatedPerson => {
+            setPersons(persons.map(person =>
+              person.id === personExist.id ? updatedPerson : person
+            ))
+          })
+      }
       return
     }
 
