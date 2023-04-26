@@ -14,7 +14,12 @@ function create(person) {
     .then(response => response.data)
 }
 
+function deletePerson(id) {
+  axios.delete(`${baseURL}/${id}`)
+}
+
 export default {
   getAll,
   create,
+  deletePerson,
 }

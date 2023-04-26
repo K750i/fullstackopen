@@ -32,7 +32,7 @@ function App() {
         handleAddNumber={(e) => setNewNumber(e.target.value)}
       />
       <h2>Numbers</h2>
-      <Display persons={persons} filter={filter} />
+      <Display persons={persons} filter={filter} handleDelete={handleDelete} />
     </div>
   )
 
@@ -42,6 +42,11 @@ function App() {
 
     if (personExist) {
       alert(`${newName} was already added to the phonebook`)
+      return
+    }
+
+    if (newName.trim() === '') {
+      alert('Name cannot be empty.')
       return
     }
 
@@ -56,6 +61,14 @@ function App() {
 
     setNewName('')
     setNewNumber('')
+  }
+
+  function handleDelete(id) {
+    const target = persons.find(person => person.id === id)
+    if (confirm(`Delete ${target.name}?`)) {
+      phoneService.deletePerson(id);
+      setPersons(persons.filter(person => person.id !== id))
+    }
   }
 }
 
