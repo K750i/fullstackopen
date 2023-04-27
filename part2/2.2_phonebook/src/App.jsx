@@ -3,13 +3,15 @@ import phoneService from './services/phoneService'
 import Filter from './components/Filter'
 import AddForm from './components/AddForm'
 import Display from './components/Display'
-import './App.css'
+import Notification from './components/Notification'
 
 function App() {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [message, setMessage] = useState(null)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     phoneService
@@ -22,6 +24,7 @@ function App() {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} isError={error} />
       <Filter name={filter} handleFilter={(e) => setFilter(e.target.value)} />
       <h2>Add a New Number</h2>
       <AddForm
@@ -41,7 +44,7 @@ function App() {
     const personExist = persons.find(person => person.name === newName)
 
     if (newName.trim() === '') {
-      alert('Name cannot be empty.')
+      toggleMessage('Name cannot be empty.', true)
       return
     }
 
@@ -53,6 +56,10 @@ function App() {
             setPersons(persons.map(person =>
               person.id === personExist.id ? updatedPerson : person
             ))
+            toggleMessage(`Phone number for ${updatedPerson.name} has been changed.`, false)
+          })
+          .catch(() => {
+            toggleMessage(`Operation failed. ${personExist.name} has been removed from the server.`, true)
           })
       }
       return
@@ -65,6 +72,7 @@ function App() {
           ...persons,
           createdPerson
         ])
+        toggleMessage(`${createdPerson.name} has been added.`, false)
       })
 
     setNewName('')
@@ -76,7 +84,14 @@ function App() {
     if (confirm(`Delete ${target.name}?`)) {
       phoneService.deletePerson(id);
       setPersons(persons.filter(person => person.id !== id))
+      toggleMessage(`${target.name} has been deleted`, false)
     }
+  }
+
+  function toggleMessage(msg, error) {
+    setMessage(msg)
+    setError(error)
+    setTimeout(() => setMessage(null), 3500)
   }
 }
 
