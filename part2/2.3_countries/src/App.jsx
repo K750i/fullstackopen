@@ -1,5 +1,5 @@
-import axios from 'axios'
 import { useState, useEffect } from 'react'
+import apiService from './services/apiService'
 import Display from './components/Display'
 
 function App() {
@@ -8,9 +8,9 @@ function App() {
   const [selected, setSelected] = useState([])
 
   useEffect(() => {
-    axios
-      .get('https://restcountries.com/v3.1/all')
-      .then(response => setCountries(response.data))
+    apiService
+      .getAllCountries()
+      .then(data => setCountries(data))
   }, [])
 
   function findCountries(e) {
