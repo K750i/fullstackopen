@@ -1,27 +1,27 @@
-import axios from 'axios'
+import axios from 'axios';
 
-const baseURL = 'http://localhost:3001/persons'
+const baseURL = '/api/persons';
 
 function getAll() {
   return axios
     .get(baseURL)
-    .then(response => response.data)
+    .then(response => response.data);
 }
 
 function create(person) {
   return axios
     .post(baseURL, person)
-    .then(response => response.data)
+    .then(response => response.data);
 }
 
 function deletePerson(id) {
-  axios.delete(`${baseURL}/${id}`)
+  axios.delete(`${baseURL}/${id}`);
 }
 
 function updatePhone(id, newObj) {
   return axios
     .put(`${baseURL}/${id}`, newObj)
-    .then(response => response.data)
+    .then(response => response.data);
 }
 
 export default {
@@ -29,4 +29,4 @@ export default {
   create,
   deletePerson,
   updatePhone,
-}
+};
