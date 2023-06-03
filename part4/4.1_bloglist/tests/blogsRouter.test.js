@@ -63,6 +63,32 @@ test('backend rejects invalid blogs', async () => {
   await api.post('/api/blogs').send(newBlog).expect(400);
 });
 
+test('deletion of a blog with valid id succeeds with a 204', async () => {
+  const blogsAtStart = await Blog.find();
+  const blogToBeDeleted = blogsAtStart[0];
+
+  await api.delete(`/api/blogs/${blogToBeDeleted.id}`).expect(204);
+
+  const blogsAtEnd = await Blog.find();
+  expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1);
+
+  const titles = blogsAtEnd.map((r) => r.title);
+  expect(titles).not.toContain(blogToBeDeleted.title);
+});
+
+test('updating a blog with valid id will succeed', async () => {
+  const blogs = await Blog.find();
+  const blogToBeUpdated = blogs[0];
+  blogToBeUpdated.likes = 88;
+
+  await api
+    .put(`/api/blogs/${blogToBeUpdated._id.toString()}`)
+    .send(blogToBeUpdated.toJSON());
+
+  const updatedBlog = await Blog.findById(blogToBeUpdated.id);
+  expect(updatedBlog).toHaveProperty('likes', 88);
+});
+
 afterAll(async () => {
   await mongoose.connection.close();
 });
