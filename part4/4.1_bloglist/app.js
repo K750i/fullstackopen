@@ -4,8 +4,10 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const config = require('./utils/config');
 const blogsRouter = require('./controllers/blogsRouter');
-const URI =
-  process.env.NODE_ENV === 'test' ? config.MONGODB_TESTURI : config.MONGODB_URI;
+const usersRouter = require('./controllers/usersRouter');
+const loginRouter = require('./controllers/login');
+const middleware = require('./utils/middleware');
+const URI = process.env.NODE_ENV === 'test' ? config.MONGODB_TESTURI : config.MONGODB_URI;
 
 mongoose.connect(URI);
 mongoose.connection.on('connected', () => {
@@ -14,11 +16,28 @@ mongoose.connection.on('connected', () => {
 
 app.use(cors());
 app.use(express.json());
-app.use('/api/blogs', blogsRouter);
+app.use(middleware.tokenExtractor);
+app.use('/api/login', loginRouter);
+app.use('/api/blogs', middleware.userExtractor, blogsRouter);
+app.use('/api/users', usersRouter);
 app.use((err, req, res, next) => {
   if (err.name === 'ValidationError') {
-    res.status(400).json({ status: 'fail', message: 'Invalid request object' });
+    return res.status(400).json({ status: 'fail', message: err.message });
   }
+
+  if (err.name === 'MongoServerError') {
+    return res.status(500).json({ status: 'fail', message: err.message });
+  }
+
+  if (err.name === 'JsonWebTokenError') {
+    return res.status(401).json({ status: 'fail', message: err.message });
+  }
+
+  if (err.name === 'Error') {
+    return res.status(500).json({ status: 'fail', message: err.message });
+  }
+
+  console.log(err.name);
   next(err);
 });
 

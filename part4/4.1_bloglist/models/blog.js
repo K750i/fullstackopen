@@ -9,6 +9,7 @@ const options = {
     },
   },
 };
+
 const blogSchema = new mongoose.Schema(
   {
     title: {
@@ -24,10 +25,12 @@ const blogSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
   },
   options
 );
 
-const Blog = mongoose.model('Blog', blogSchema);
-
-module.exports = Blog;
+module.exports = mongoose.model('Blog', blogSchema);
